@@ -8,6 +8,8 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var isRecording = false
 
+public var accessedFilePaths: Set<URL> = []
+
 /// Whether or not to record all new references.
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
 @available(*, deprecated, renamed: "isRecording")
@@ -208,7 +210,9 @@ public func verifySnapshot<Value, Format>(
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
-
+      
+      accessedFilePaths.insert(snapshotFileUrl)
+      
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
       snapshotting.snapshot(try value()).run { b in
